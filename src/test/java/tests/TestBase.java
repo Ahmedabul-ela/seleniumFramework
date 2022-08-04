@@ -1,5 +1,6 @@
 package tests;
 
+import java.lang.ref.PhantomReference;
 import java.util.HashMap;
 
 import org.openqa.selenium.WebDriver;
@@ -9,6 +10,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -33,15 +35,15 @@ public class TestBase extends AbstractTestNGCucumberTests{
 		option.addPreference("Browser.download.manager.showWhenStarting", false);
 		return option;
 	}
-		public static ChromeOptions chromeoption() {
-			ChromeOptions option = new ChromeOptions();
-			HashMap<String, Object> chromeprefs = new HashMap<String, Object>();
-			chromeprefs.put("Profile.default.content_settings.popups", 0); //default
-			chromeprefs.put("download.default_directory", downloadspath);
-			option.setExperimentalOption("prefs", chromeprefs);
-			option.setCapability(CapabilityType.ACCEPT_SSL_CERTS,true);
-			return option;
-		}
+	public static ChromeOptions chromeoption() {
+		ChromeOptions option = new ChromeOptions();
+		HashMap<String, Object> chromeprefs = new HashMap<String, Object>();
+		chromeprefs.put("Profile.default.content_settings.popups", 0); //default
+		chromeprefs.put("download.default_directory", downloadspath);
+		option.setExperimentalOption("prefs", chromeprefs);
+		option.setCapability(CapabilityType.ACCEPT_SSL_CERTS,true);
+		return option;
+	}
 	@BeforeSuite
 	@Parameters({"browser"})
 	public void startDriver(@Optional("chrome") String browsername) {     // chrome by default
@@ -62,6 +64,14 @@ public class TestBase extends AbstractTestNGCucumberTests{
 		}else if (browsername.equalsIgnoreCase("safari")) {
 			driver = new SafariDriver();
 
+		}else if (browsername.equalsIgnoreCase("headless")) {
+			DesiredCapabilities caps = new DesiredCapabilities();
+			caps.setJavascriptEnabled(true);
+			caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,
+					System.getProperty("user.dir"+"\\Drivers\\phantomjs.exe");
+			String[] phantomJsArgs = ("--web-security=no","--Ignore-SSl-errors=yes");
+			caps.setCapability(PhantomJSDriverService.PHANTOM_CLI_ARGS,phantomJsArgs);
+			driver = new PhatomJsDriver(caps);
 		}
 		driver.manage().window().maximize();
 		driver.navigate().to("https://demo.nopcommerce.com/");
@@ -71,10 +81,10 @@ public class TestBase extends AbstractTestNGCucumberTests{
 	public void stopDriver() {
 		driver.quit();
 	}
-	
+
 	@AfterMethod
 	public void ScreenShotOnFalliure(ITestResult result) {
-		
+
 		if (result.getStatus() == ITestResult.FAILURE) {
 			System.out.println("FAILED!");
 			System.out.println("Taking Screenshot....");
