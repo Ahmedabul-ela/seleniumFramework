@@ -8,8 +8,11 @@ import java.util.Properties;
 public class LoadProperities {
 
 	public static Properties userdata
-	        = loadProperities(System.getProperty("user.dir")+"\\src\\main\\java\\Properties\\userdata.properties");
-
+	           = loadProperities(System.getProperty("user.dir")+"\\src\\main\\java\\Properties\\userdata.properties");
+	 //saucelabs
+	public static Properties saucelabsuserdata
+	           = loadProperities(System.getProperty("user.dir")+"\\src\\main\\java\\Properties\\sauceladuser.properties");
+	
 	private static Properties loadProperities(String path) {
 		Properties pro = new Properties();
 		try{
